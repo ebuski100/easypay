@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  PAYSTACK
+}
+
+model Customer {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+  phone     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  payments  Payment[]
+}
+
+model Payment {
+  id                String           @id @default(cuid())
+  reference         String           @unique
+  customerId        String
+  amount            Int
+  currency          String           @db.VarChar(3)
+  status            PaymentStatus    @default(PENDING)
+  paystackReference String?          @unique
+  description       String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  customer          Customer         @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  attempts          PaymentAttempt[]
+
+  @@index([customerId, createdAt])
+  @@index([status, createdAt])
+}
+
+model PaymentAttempt {
+  id                String          @id @default(cuid())
+  paymentId         String
+  provider          PaymentProvider
+  providerReference String?
+  status            PaymentStatus   @default(PENDING)
+  amount            Int
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  payment           Payment         @relation(fields: [paymentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([paymentId, createdAt])
+  @@index([provider, providerReference])
+  @@index([status, createdAt])
+}
+
+model WebhookEvent {
+  id          String          @id @default(cuid())
+  provider    PaymentProvider
+  eventId     String
+  eventType   String
+  payload     Json            @db.JsonB
+  processed   Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  processedAt DateTime?
+
+  @@unique([provider, eventId])
+  @@index([processed, createdAt])
+  @@index([provider, eventType, createdAt])
+}

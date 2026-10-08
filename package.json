@@ -1,0 +1,15 @@
+{
+  "name": "payment-platform",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=@payment-platform/web",
+    "dev:api": "npm run dev --workspace=@payment-platform/api",
+    "build:web": "npm run build --workspace=@payment-platform/web",
+    "build:api": "npm run build --workspace=@payment-platform/api",
+    "typecheck": "npm run typecheck --workspace=@payment-platform/web && npm run typecheck --workspace=@payment-platform/api"
+  }
+}
