@@ -1,5 +1,7 @@
 import { Router } from "express";
-import { postPayment } from "../controllers/payment.controller.js";
+import { getPaymentVerification, postPayment } from "../controllers/payment.controller.js";
+import { requireAuthentication } from "../middleware/auth.middleware.js";
 
 export const paymentRouter = Router();
-paymentRouter.post("/", postPayment);
+paymentRouter.get("/:reference/verify", requireAuthentication, getPaymentVerification);
+paymentRouter.post("/", requireAuthentication, postPayment);

@@ -7,13 +7,17 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:status": "prisma migrate status",
     "test": "tsx --test src/routes/payment.integration.test.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
+    "argon2": "^0.45.1",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "jose": "^6.2.12",
     "zod": "^4.1.0"
   },
   "devDependencies": {
